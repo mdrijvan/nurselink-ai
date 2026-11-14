@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NurseLink AI - Patient Health Progress Tracking & AI Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-blue-600 text-white shadow-md p-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-hospital-user text-2xl"></i>
+                <h1 class="text-xl font-bold">NurseLink AI - Hospital Monitoring & Progress Tracking</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="bg-blue-700 px-3 py-1 rounded text-sm"><i class="fa-solid fa-user-shield mr-1"></i> Authorized Doctor/Nurse</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Patient Admission & List -->
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 md:col-span-1">
+                <h2 class="text-lg font-semibold text-blue-600 mb-4"><i class="fa-solid fa-bed-pulse mr-2"></i>Patient Admission Profile</h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Select Patient</label>
+                        <select id="patientSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" onchange="loadPatientData()">
+                            <option value="P001">P001 - Rajesh Kumar (Ward A, Bed 4)</option>
+                            <option value="P002">P002 - Sunita Devi (Ward B, Bed 12)</option>
+                        </select>
+                    </div>
+                    <div class="p-3 bg-blue-50 rounded border border-blue-100 text-sm space-y-1">
+                        <p><strong>Admission Date:</strong> <span id="admDate">2026-11-10 09:30 AM</span></p>
+                        <p><strong>Initial Condition:</strong> <span id="admCond">High Fever, Elevated HR</span></p>
+                        <p><strong>Smart Glove ID:</strong> <span id="gloveId">SG-9942</span></p>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h3 class="text-md font-semibold text-gray-800 mb-3"><i class="fa-solid fa-notes-medical mr-2"></i>Clinical Observation</h3>
+                <textarea id="clinicalNote" rows="3" class="w-full border rounded p-2 text-sm" placeholder="Add doctor or nurse observation..."></textarea>
+                <button onclick="saveObservation()" class="mt-2 w-full bg-blue-600 text-white py-2 rounded text-sm font-medium hover:bg-blue-700">Save Observation</button>
+            </div>
+
+            <!-- Dashboard & Progress Tracking -->
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 md:col-span-2 space-y-6">
+                <!-- Tabs -->
+                <div class="flex border-b space-x-4 text-sm font-medium">
+                    <button onclick="switchTab('comparison')" id="btn-comparison" class="pb-2 border-b-2 border-blue-600 text-blue-600">Admission vs Current</button>
+                    <button onclick="switchTab('analytics')" id="btn-analytics" class="pb-2 text-gray-500">Analytics & Trends</button>
+                    <button onclick="switchTab('ai')" id="btn-ai" class="pb-2 text-gray-500">Gemini AI Analysis</button>
+                </div>
+
+                <!-- Tab 1: Comparison Table -->
+                <div id="tab-comparison" class="space-y-4">
+                    <h3 class="font-semibold text-gray-800">Patient Health Progress Comparison</h3>
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-gray-100 border-b">
+                                <th class="p-2">Health Parameter</th>
+                                <th class="p-2">Admission Baseline</th>
+                                <th class="p-2">Current Reading</th>
+                                <th class="p-2">Trend Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="p-2 font-medium">Heart Rate</td>
+                                <td class="p-2">115 bpm</td>
+                                <td class="p-2">82 bpm</td>
+                                <td class="p-2 text-green-600 font-semibold">Stable / Improved</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="p-2 font-medium">Body Temperature</td>
+                                <td class="p-2">102.4 °F</td>
+                                <td class="p-2">98.8 °F</td>
+                                <td class="p-2 text-green-600 font-semibold">Improved (Decreased)</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="p-2 font-medium">SpO2</td>
+                                <td class="p-2">92%</td>
+                                <td class="p-2">98%</td>
+                                <td class="p-2 text-green-600 font-semibold">Improved</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="p-2 font-medium">Mobility Status</td>
+                                <td class="p-2">Low / Bedridden</td>
+                                <td class="p-2">Moderate / Ambulatory</td>
+                                <td class="p-2 text-blue-600 font-semibold">Progressing</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tab 2: Analytics Charts -->
+                <div id="tab-analytics" class="hidden space-y-4">
+                    <h3 class="font-semibold text-gray-800">Live Health Trends & Vitals</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-3 rounded border">
+                            <canvas id="hrChart" height="120"></canvas>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded border">
+                            <canvas id="tempChart" height="120"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Gemini AI Report -->
+                <div id="tab-ai" class="hidden space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-semibold text-gray-800"><i class="fa-solid fa-brain text-purple-600 mr-2"></i>Gemini AI Longitudinal Health Analysis</h3>
+                        <button onclick="generateAIReport()" class="bg-purple-600 text-white px-3 py-1.5 rounded text-sm hover:bg-purple-700">Generate Report</button>
+                    </div>
+                    <div id="aiReportOutput" class="p-4 bg-purple-50 rounded border border-purple-100 text-sm text-gray-700 space-y-2">
+                        <p><em>Click 'Generate Report' to analyze patient admission vs current metrics via Gemini AI module.</em></p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.getElementById('tab-comparison').classList.add('hidden');
+            document.getElementById('tab-analytics').classList.add('hidden');
+            document.getElementById('tab-ai').classList.add('hidden');
+            document.getElementById('btn-comparison').className = 'pb-2 text-gray-500';
+            document.getElementById('btn-analytics').className = 'pb-2 text-gray-500';
+            document.getElementById('btn-ai').className = 'pb-2 text-gray-500';
+
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            document.getElementById('btn-' + tab).className = 'pb-2 border-b-2 border-blue-600 text-blue-600 font-medium';
+
+            if(tab === 'analytics') initCharts();
+        }
+
+        function saveObservation() {
+            const note = document.getElementById('clinicalNote').value;
+            if(!note) { alert('Please enter an observation.'); return; }
+            alert('Clinical observation saved successfully and logged to timeline!');
+            document.getElementById('clinicalNote').value = '';
+        }
+
+        function generateAIReport() {
+            const output = document.getElementById('aiReportOutput');
+            output.innerHTML = `
+                <p><strong>[Gemini AI Clinical Summary]:</strong></p>
+                <p>Since admission, the patient's body temperature has decreased from 102.4°F to a stable 98.8°F. SpO2 levels have improved from 92% to 98% baseline. Mobility metrics indicate active recovery.</p>
+                <p class="text-xs text-purple-900 mt-2"><strong>Note:</strong> Measured facts processed via AI interpretation. Requires final clinical review by treating physician.</p>
+            `;
+        }
+
+        let chartsInitialized = false;
+        function initCharts() {
+            if(chartsInitialized) return;
+            const ctx1 = document.getElementById('hrChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['Admission', 'Day 1', 'Day 2', 'Current'],
+                    datasets: [{ label: 'Heart Rate (bpm)', data: [115, 102, 90, 82], borderColor: 'rgb(37, 99, 235)', tension: 0.1 }]
+                }
+            });
+            const ctx2 = document.getElementById('tempChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['Admission', 'Day 1', 'Day 2', 'Current'],
+                    datasets: [{ label: 'Temperature (°F)', data: [102.4, 101.0, 99.5, 98.8], borderColor: 'rgb(220, 38, 38)', tension: 0.1 }]
+                }
+            });
+            chartsInitialized = true;
+        }
+
+        function loadPatientData() {
+            const p = document.getElementById('patientSelect').value;
+            if(p === 'P002') {
+                document.getElementById('admDate').innerText = '2026-11-12 02:15 PM';
+                document.getElementById('admCond').innerText = 'Chest Pain, Low SpO2';
+                document.getElementById('gloveId').innerText = 'SG-1104';
+            } else {
+                document.getElementById('admDate').innerText = '2026-11-10 09:30 AM';
+                document.getElementById('admCond').innerText = 'High Fever, Elevated HR';
+                document.getElementById('gloveId').innerText = 'SG-9942';
+            }
+        }
+    </script>
+</body>
+</html>
